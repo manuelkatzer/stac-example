@@ -40,11 +40,11 @@ LAS_EXTENSIONS = {".las", ".laz"}
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".tif", ".tiff"}
 
 
-def base_collection(collection_id: str, description: str) -> dict[str, Any]:
+def base_collection(collection_id: str, description: str, title: str | None = None) -> dict[str, Any]:
     # Placeholder only - real extent is computed from actual items in main()
     # and merged with whatever the collection already covers, before this
     # gets upserted. Never left in place on a collection that has items.
-    return {
+    doc: dict[str, Any] = {
         "id": collection_id,
         "type": "Collection",
         "stac_version": "1.0.0",
@@ -56,6 +56,15 @@ def base_collection(collection_id: str, description: str) -> dict[str, Any]:
         },
         "links": [],
     }
+    if title:
+        doc["title"] = title
+    return doc
+
+
+def title_from_path(root: Path, depth: int = 3) -> str:
+    """A human-readable title from the last `depth` folder names in root."""
+    parts = [p for p in root.parts if p not in ("/", "\\")]
+    return " / ".join(parts[-depth:]) if parts else root.name
 
 
 def batch_extent(items: list[dict[str, Any]]) -> tuple[list[float], list[str]] | None:
@@ -343,6 +352,12 @@ def main() -> None:
             "embedded CRS always takes priority."
         ),
     )
+    parser.add_argument(
+        "--title-depth",
+        type=int,
+        default=3,
+        help="Number of innermost folder names to join into the collection title (default: 3)",
+    )
     parser.add_argument("--dry-run", action="store_true", help="Scan and report only, do not write to the database")
     args = parser.parse_args()
 
@@ -386,9 +401,13 @@ def main() -> None:
     db = PgstacDB(dsn=args.dsn)
     loader = Loader(db=db)
 
+    folder_title = title_from_path(root, depth=args.title_depth)
+
     if las_items:
         collection_doc = base_collection(
-            args.pointcloud_collection, "LAS/LAZ point clouds ingested from local storage"
+            args.pointcloud_collection,
+            "LAS/LAZ point clouds ingested from local storage",
+            title=f"{folder_title} - Point Clouds",
         )
         bbox, time_range = batch_extent(las_items)
         existing = fetch_existing_extent(args.dsn, args.pointcloud_collection)
@@ -398,7 +417,9 @@ def main() -> None:
 
     if pano_items:
         collection_doc = base_collection(
-            args.panorama_collection, "360 panoramic photos ingested from local storage"
+            args.panorama_collection,
+            "360 panoramic photos ingested from local storage",
+            title=f"{folder_title} - Panoramas",
         )
         bbox, time_range = batch_extent(pano_items)
         existing = fetch_existing_extent(args.dsn, args.panorama_collection)

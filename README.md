@@ -18,7 +18,7 @@ cp .env.example .env
 docker compose up -d
 ```
 
-This starts three containers:
+This starts four containers:
 
 - **pgstac** - Postgres + PostGIS with the pgstac schema (migrations run
   automatically on first start)
@@ -27,6 +27,11 @@ This starts three containers:
   plain HTTP on `http://localhost:8081`, so that STAC asset links are
   actually fetchable by pgstac/QGIS. Point your LAS/LAZ files and
   panoramas somewhere under this folder.
+- **stac-browser** - a proper browsable catalogue UI, on
+  `http://localhost:8082`. This is what to point people at if you want
+  them to "just go to the service and see what data exists" - it shows
+  collections, their extents, and lets you drill into items, which QGIS's
+  STAC panel isn't really built for.
 
 Check the API came up:
 
@@ -77,6 +82,12 @@ Data Source Manager → STAC → new connection → `http://localhost:8080`.
 Use Filters to draw a bounding box and search - footprints for point
 clouds and location points for panoramas should show up on the canvas,
 same as with Earth Search.
+
+QGIS is item-search-oriented rather than catalogue-browsing-oriented: it
+shows footprints once you filter and search, but doesn't visualize
+collection-level extents on the map. For a "walk up and see what data we
+have" experience, point people at stac-browser
+(`http://localhost:8082`) instead - that's what it's built for.
 
 ## Known limitations / next steps
 
