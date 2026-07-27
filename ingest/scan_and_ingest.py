@@ -227,7 +227,24 @@ def read_las_metadata(path: Path, assume_crs: CRS | None = None) -> dict[str, An
         "point_count": int(header.point_count),
         "is_copc": looks_like_copc(path),
         "crs_assumed": crs is assume_crs and assume_crs is not None,
+        "crs": crs,
     }
+
+
+def proj_properties(crs: CRS) -> dict[str, Any]:
+    """STAC `proj` extension fields (v2.0) describing an item's native CRS.
+
+    `proj:code` (e.g. "EPSG:5682") is the standard, human/machine-friendly
+    identifier when the CRS has one. `proj:wkt2` is always included too, as
+    a robust fallback for CRSes without a registered code (e.g. custom or
+    unregistered systems) and for clients that prefer exact WKT over a
+    code lookup.
+    """
+    props: dict[str, Any] = {"proj:wkt2": crs.to_wkt()}
+    authority = crs.to_authority()
+    if authority is not None:
+        props["proj:code"] = f"{authority[0]}:{authority[1]}"
+    return props
 
 
 def build_las_item(path: Path, meta: dict[str, Any], collection: str, asset_base_url: str, data_root: Path) -> dict[str, Any]:
@@ -236,6 +253,9 @@ def build_las_item(path: Path, meta: dict[str, Any], collection: str, asset_base
     return {
         "type": "Feature",
         "stac_version": "1.0.0",
+        "stac_extensions": [
+            "https://stac-extensions.github.io/projection/v2.0.0/schema.json",
+        ],
         "id": path.stem,
         "collection": collection,
         "geometry": meta["geometry"],
@@ -244,6 +264,7 @@ def build_las_item(path: Path, meta: dict[str, Any], collection: str, asset_base
             "datetime": meta["datetime"].isoformat(),
             "pc:count": meta["point_count"],
             "crs:assumed": meta["crs_assumed"],
+            **proj_properties(meta["crs"]),
         },
         "assets": {
             "data": {

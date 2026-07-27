@@ -34,10 +34,10 @@ STAC's own bbox convention - same as what you'd draw in QGIS's STAC
 filter dialog.
 
 `--crs` is the point cloud's *native* CRS (the one the file's actual
-X/Y/Z coordinates are stored in). This has to be supplied explicitly for
-now, since STAC items don't carry it yet - see the note at the bottom of
-this file about adding a `proj:code` property during ingest to remove
-this requirement.
+X/Y/Z coordinates are stored in). Optional if the matched item carries a
+`proj:code` property (added by scan_and_ingest.py) - the script will use
+that automatically. Only required if the item predates that property or
+was ingested some other way.
 """
 from __future__ import annotations
 
@@ -114,8 +114,12 @@ def main() -> None:
         required=True, help="Crop area in WGS84 lon/lat - also used to find the item if --item is not given",
     )
     parser.add_argument(
-        "--crs", required=True,
-        help="The point cloud's native CRS (e.g. EPSG:5682) - needed to convert --bbox into the file's own coordinates",
+        "--crs", default=None,
+        help=(
+            "The point cloud's native CRS (e.g. EPSG:5682) - needed to convert --bbox "
+            "into the file's own coordinates. Optional if the item carries a proj:code "
+            "property (see scan_and_ingest.py); required otherwise."
+        ),
     )
     parser.add_argument("--resolution", type=float, default=None, help="Optional: limit octree levels fetched, for a coarser/faster crop")
     parser.add_argument("--output-dir", type=Path, default=Path("output"), help="Folder for output files (created if missing)")
@@ -130,7 +134,16 @@ def main() -> None:
     href = item["assets"]["data"]["href"]
     print(f"Using item {item['id']!r}, asset: {href}")
 
-    bounds = native_bounds(args.bbox, args.crs)
+    native_crs = args.crs or item.get("properties", {}).get("proj:code")
+    if native_crs is None:
+        sys.exit(
+            "Item has no proj:code property and --crs was not given - "
+            "pass --crs EPSG:XXXX explicitly."
+        )
+    if args.crs is None:
+        print(f"Using native CRS from item's proj:code: {native_crs}")
+
+    bounds = native_bounds(args.bbox, native_crs)
     print(f"Querying native bounds: mins={bounds.mins}, maxs={bounds.maxs}")
 
     with CopcReader.open(href) as reader:
@@ -140,22 +153,9 @@ def main() -> None:
         keys = save_npz(points, npz_path)
         print(f"Saved {npz_path}: {keys}")
 
-        save_laz(points, reader, args.crs, laz_path)
-        print(f"Saved {laz_path} (CRS: {args.crs}, point format: {reader.header.point_format.id})")
+        save_laz(points, reader, native_crs, laz_path)
+        print(f"Saved {laz_path} (CRS: {native_crs}, point format: {reader.header.point_format.id})")
 
 
 if __name__ == "__main__":
     main()
-
-# ---------------------------------------------------------------------------
-# Note: making --crs unnecessary
-#
-# Right now the script needs --crs because STAC items in this pipeline only
-# store the WGS84-reprojected bbox/geometry, not the point cloud's native
-# CRS. The STAC "proj" extension has a standard field for exactly this -
-# `proj:code` (e.g. "EPSG:5682") - which would let this script read the
-# native CRS straight off the item instead of you having to know and pass
-# it. Worth adding to scan_and_ingest.py's build_las_item() as a follow-up:
-# one extra property, and every downstream tool (including this script)
-# stops needing --crs at all.
-# ---------------------------------------------------------------------------
