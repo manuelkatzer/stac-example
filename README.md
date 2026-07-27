@@ -57,6 +57,22 @@ uv run ingest/scan_and_ingest.py ./data \
   --asset-base-url http://localhost:8081
 ```
 
+Point it at `./data` itself (the same folder the `fileserver` container
+serves) rather than a subfolder - it walks the whole tree recursively,
+so any file in any nested subfolder gets found and its asset URL is
+computed correctly relative to that root automatically. Only pass
+`--data-root` separately if you deliberately want to scan a subset of
+the tree while still getting root-relative URLs.
+
+Re-running the same command is fast and safe: a manifest file
+(`.stac_ingest_manifest.json` by default, see `--manifest`) tracks which
+files were already successfully ingested by path + size + modified time,
+so unchanged files are skipped without re-parsing their headers - only
+new or changed files get processed. A file that failed to ingest (e.g.
+missing CRS) is never marked done, so it's retried on every run until
+you fix it (or pass `--assume-crs`). Delete the manifest file to force a
+full re-scan.
+
 `uv sync` reads `pyproject.toml`, creates `.venv/`, and writes `uv.lock` on
 first run. Commit `uv.lock` once it exists so everyone (and CI) resolves
 the same dependency versions.
