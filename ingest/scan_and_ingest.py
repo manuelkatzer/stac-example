@@ -26,6 +26,7 @@ from pathlib import Path
 from typing import Any, Iterable
 
 import laspy
+import psycopg
 from PIL import Image
 from PIL.ExifTags import GPSTAGS, TAGS
 from pyproj import CRS, Transformer
@@ -40,8 +41,9 @@ IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".tif", ".tiff"}
 
 
 def base_collection(collection_id: str, description: str) -> dict[str, Any]:
-    # Extent is a wide-open placeholder. pgstac can recompute the real
-    # extent from ingested items - see the README for how to do that.
+    # Placeholder only - real extent is computed from actual items in main()
+    # and merged with whatever the collection already covers, before this
+    # gets upserted. Never left in place on a collection that has items.
     return {
         "id": collection_id,
         "type": "Collection",
@@ -53,6 +55,69 @@ def base_collection(collection_id: str, description: str) -> dict[str, Any]:
             "temporal": {"interval": [[None, None]]},
         },
         "links": [],
+    }
+
+
+def batch_extent(items: list[dict[str, Any]]) -> tuple[list[float], list[str]] | None:
+    """Bounding box and datetime range covering everything in `items`."""
+    if not items:
+        return None
+    bboxes = [item["bbox"] for item in items]
+    bbox = [
+        min(b[0] for b in bboxes), min(b[1] for b in bboxes),
+        max(b[2] for b in bboxes), max(b[3] for b in bboxes),
+    ]
+    datetimes = sorted(item["properties"]["datetime"] for item in items)
+    return bbox, [datetimes[0], datetimes[-1]]
+
+
+def fetch_existing_extent(dsn: str, collection_id: str) -> dict[str, Any] | None:
+    """The current extent object for a collection already in pgstac, if any."""
+    try:
+        with psycopg.connect(dsn) as conn, conn.cursor() as cur:
+            cur.execute("SELECT content->'extent' FROM collections WHERE id = %s", (collection_id,))
+            row = cur.fetchone()
+            return row[0] if row else None
+    except Exception as exc:  # noqa: BLE001
+        log.warning(
+            "Could not read existing extent for collection %r (%s) - "
+            "starting fresh from this batch only",
+            collection_id, exc,
+        )
+        return None
+
+
+def merge_extents(
+    existing: dict[str, Any] | None,
+    bbox: list[float],
+    time_range: list[str],
+) -> dict[str, Any]:
+    """Union an existing collection extent with a new batch's extent."""
+    if existing is None:
+        merged_bbox, merged_time = bbox, time_range
+    else:
+        old_bbox = existing.get("spatial", {}).get("bbox", [[None]])[0]
+        old_time = existing.get("temporal", {}).get("interval", [[None, None]])[0]
+
+        if old_bbox and old_bbox[0] is not None and old_bbox != [-180, -90, 180, 90]:
+            merged_bbox = [
+                min(old_bbox[0], bbox[0]), min(old_bbox[1], bbox[1]),
+                max(old_bbox[2], bbox[2]), max(old_bbox[3], bbox[3]),
+            ]
+        else:
+            merged_bbox = bbox
+
+        old_start, old_end = (old_time + [None, None])[:2]
+        candidates_start = [t for t in (old_start, time_range[0]) if t is not None]
+        candidates_end = [t for t in (old_end, time_range[1]) if t is not None]
+        merged_time = [
+            min(candidates_start) if candidates_start else None,
+            max(candidates_end) if candidates_end else None,
+        ]
+
+    return {
+        "spatial": {"bbox": [merged_bbox]},
+        "temporal": {"interval": [merged_time]},
     }
 
 
@@ -321,18 +386,24 @@ def main() -> None:
     db = PgstacDB(dsn=args.dsn)
     loader = Loader(db=db)
 
-    loader.load_collections(
-        [base_collection(args.pointcloud_collection, "LAS/LAZ point clouds ingested from local storage")],
-        insert_mode=Methods.upsert,
-    )
-    loader.load_collections(
-        [base_collection(args.panorama_collection, "360 panoramic photos ingested from local storage")],
-        insert_mode=Methods.upsert,
-    )
-
     if las_items:
+        collection_doc = base_collection(
+            args.pointcloud_collection, "LAS/LAZ point clouds ingested from local storage"
+        )
+        bbox, time_range = batch_extent(las_items)
+        existing = fetch_existing_extent(args.dsn, args.pointcloud_collection)
+        collection_doc["extent"] = merge_extents(existing, bbox, time_range)
+        loader.load_collections([collection_doc], insert_mode=Methods.upsert)
         loader.load_items(las_items, insert_mode=Methods.upsert)
+
     if pano_items:
+        collection_doc = base_collection(
+            args.panorama_collection, "360 panoramic photos ingested from local storage"
+        )
+        bbox, time_range = batch_extent(pano_items)
+        existing = fetch_existing_extent(args.dsn, args.panorama_collection)
+        collection_doc["extent"] = merge_extents(existing, bbox, time_range)
+        loader.load_collections([collection_doc], insert_mode=Methods.upsert)
         loader.load_items(pano_items, insert_mode=Methods.upsert)
 
     log.info("Loaded %d point cloud item(s) and %d panorama item(s) into pgstac", len(las_items), len(pano_items))

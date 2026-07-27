@@ -80,15 +80,21 @@ same as with Earth Search.
 
 ## Known limitations / next steps
 
+- **`pypgstac` and the `pgstac` Docker image must be on the exact same
+  version.** pgstac checks this strictly and refuses to run otherwise -
+  see `pyproject.toml` (`pypgstac==0.9.8`) and `docker-compose.yml`
+  (`ghcr.io/stac-utils/pgstac:v0.9.8`). If you bump one, bump the other
+  to match, then `uv sync` and `docker compose up -d --force-recreate
+  pgstac`.
 - **COPC detection is a filename heuristic** (`*.copc.laz`), not a real
   parse of the COPC info VLR. If you need certainty about whether a file
   will stream in QGIS as a point cloud layer vs. require a full download
   first, verify with `pdal info --metadata` before relying on this.
-- **Collection extents are placeholders** (the whole globe / no time
-  bound). pgstac can recompute real extents from the ingested items -
-  worth wiring up `pgstac.update_collection_extents()` as a follow-up
-  step after ingest, so QGIS's collection listing shows accurate
-  coverage.
+- **Collection extents are computed from the actual items being loaded**,
+  merged with whatever the collection already covered from previous runs
+  - so re-running the script against new files grows the extent rather
+  than shrinking or overwriting it. No manual extent-recompute step
+  needed.
 - **Panorama detection is a heuristic** (aspect ratio + GPS EXIF), not a
   check of the Google `GPano` XMP tags that mark a file as a genuine
   equirectangular capture. Fine for a first pass; worth tightening if
