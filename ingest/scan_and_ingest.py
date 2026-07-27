@@ -41,11 +41,11 @@ LAS_EXTENSIONS = {".las", ".laz"}
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".tif", ".tiff"}
 
 
-def base_collection(collection_id: str, description: str, title: str | None = None) -> dict[str, Any]:
+def base_collection(collection_id: str, description: str) -> dict[str, Any]:
     # Placeholder only - real extent is computed from actual items in main()
     # and merged with whatever the collection already covers, before this
     # gets upserted. Never left in place on a collection that has items.
-    doc: dict[str, Any] = {
+    return {
         "id": collection_id,
         "type": "Collection",
         "stac_version": "1.0.0",
@@ -57,15 +57,6 @@ def base_collection(collection_id: str, description: str, title: str | None = No
         },
         "links": [],
     }
-    if title:
-        doc["title"] = title
-    return doc
-
-
-def title_from_path(root: Path, depth: int = 3) -> str:
-    """A human-readable title from the last `depth` folder names in root."""
-    parts = [p for p in root.parts if p not in ("/", "\\")]
-    return " / ".join(parts[-depth:]) if parts else root.name
 
 
 def batch_extent(items: list[dict[str, Any]]) -> tuple[list[float], list[str]] | None:
@@ -284,12 +275,10 @@ def read_pano_metadata(path: Path) -> dict[str, Any] | None:
         log.warning("Skipping %s: could not read image (%s)", path, exc)
         return None
 
-    if height == 0 or abs(width / height - 2.0) > 0.05:
-        log.warning(
-            "Skipping %s: not a 2:1 equirectangular panorama (dimensions %sx%s)",
-            path, width, height,
-        )
-        return None
+    # Classify rather than reject: true equirectangular panoramas are ~2:1,
+    # but a perfectly ordinary geotagged photo (any aspect ratio) is just
+    # as valid to place on a map - it just isn't a 360 panorama.
+    is_equirectangular = height > 0 and abs(width / height - 2.0) <= 0.05
 
     gps_ifd = exif.get_ifd(0x8825) if hasattr(exif, "get_ifd") else {}
     if not gps_ifd:
@@ -319,7 +308,14 @@ def read_pano_metadata(path: Path) -> dict[str, Any] | None:
     if capture_dt is None:
         capture_dt = dt.datetime.fromtimestamp(path.stat().st_mtime, tz=dt.timezone.utc)
 
-    return {"lon": lon, "lat": lat, "datetime": capture_dt, "width": width, "height": height}
+    return {
+        "lon": lon,
+        "lat": lat,
+        "datetime": capture_dt,
+        "width": width,
+        "height": height,
+        "photo_type": "equirectangular" if is_equirectangular else "perspective",
+    }
 
 
 def build_pano_item(path: Path, meta: dict[str, Any], collection: str, asset_base_url: str, data_root: Path) -> dict[str, Any]:
@@ -334,7 +330,7 @@ def build_pano_item(path: Path, meta: dict[str, Any], collection: str, asset_bas
         "bbox": [meta["lon"], meta["lat"], meta["lon"], meta["lat"]],
         "properties": {
             "datetime": meta["datetime"].isoformat(),
-            "panorama:type": "equirectangular",
+            "panorama:type": meta["photo_type"],
             "panorama:width": meta["width"],
             "panorama:height": meta["height"],
         },
@@ -385,12 +381,6 @@ def main() -> None:
             "applied when the file itself has nothing usable - a real "
             "embedded CRS always takes priority."
         ),
-    )
-    parser.add_argument(
-        "--title-depth",
-        type=int,
-        default=3,
-        help="Number of innermost folder names to join into the collection title (default: 3)",
     )
     parser.add_argument(
         "--manifest",
@@ -474,13 +464,10 @@ def main() -> None:
     db = PgstacDB(dsn=args.dsn)
     loader = Loader(db=db)
 
-    folder_title = title_from_path(root, depth=args.title_depth)
-
     if las_items:
         collection_doc = base_collection(
             args.pointcloud_collection,
             "LAS/LAZ point clouds ingested from local storage",
-            title=f"{folder_title} - Point Clouds",
         )
         bbox, time_range = batch_extent(las_items)
         existing = fetch_existing_extent(args.dsn, args.pointcloud_collection)
@@ -492,7 +479,6 @@ def main() -> None:
         collection_doc = base_collection(
             args.panorama_collection,
             "360 panoramic photos ingested from local storage",
-            title=f"{folder_title} - Panoramas",
         )
         bbox, time_range = batch_extent(pano_items)
         existing = fetch_existing_extent(args.dsn, args.panorama_collection)
