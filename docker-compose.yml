@@ -1,0 +1,61 @@
+services:
+  pgstac:
+    image: ghcr.io/stac-utils/pgstac:v0.9.8
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-username}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_DB: ${POSTGRES_DBNAME:-postgis}
+      PGUSER: ${POSTGRES_USER:-username}
+      PGPASSWORD: ${POSTGRES_PASSWORD:-password}
+      PGDATABASE: ${POSTGRES_DBNAME:-postgis}
+    ports:
+      - "5439:5432"
+    volumes:
+      - pgstac_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-username} -d ${POSTGRES_DBNAME:-postgis}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  stac-fastapi:
+    image: ghcr.io/stac-utils/stac-fastapi-pgstac:latest
+    depends_on:
+      pgstac:
+        condition: service_healthy
+    environment:
+      APP_HOST: 0.0.0.0
+      APP_PORT: 8080
+      RELOAD: "true"
+      ENVIRONMENT: local
+      # NOTE: some newer stac-fastapi-pgstac releases renamed these to
+      # PGUSER/PGPASSWORD/PGHOST/PGPORT/PGDATABASE. If the API container
+      # can't reach the DB, check `docker compose logs stac-fastapi` and
+      # try that naming instead.
+      POSTGRES_USER: ${POSTGRES_USER:-username}
+      POSTGRES_PASS: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_DBNAME: ${POSTGRES_DBNAME:-postgis}
+      POSTGRES_HOST_READER: pgstac
+      POSTGRES_HOST_WRITER: pgstac
+      POSTGRES_PORT: 5432
+      WEB_CONCURRENCY: 1
+      USE_API_HYDRATE: "true"
+      ENABLE_TRANSACTIONS_EXTENSIONS: "true"
+    ports:
+      - "8080:8080"
+
+  # Serves ./data over plain HTTP so STAC asset hrefs (and QGIS) can
+  # actually fetch the LAS/LAZ and panorama files. Swap this out for
+  # nginx, S3, or whatever you already run in production.
+  fileserver:
+    image: halverneus/static-file-server:latest
+    environment:
+      FOLDER: /web
+      SHOW_LISTING: "true"
+    volumes:
+      - ${DATA_DIR:-./data}:/web:ro
+    ports:
+      - "8081:8080"
+
+volumes:
+  pgstac_data:
