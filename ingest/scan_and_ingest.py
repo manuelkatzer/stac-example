@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import json
 import logging
 import sys
 from pathlib import Path
@@ -136,6 +137,26 @@ def iter_files(root: Path, extensions: set[str]) -> Iterable[Path]:
             yield path
 
 
+def load_manifest(path: Path) -> dict[str, dict[str, int]]:
+    """rel_path -> {mtime_ns, size} for every file successfully ingested so far."""
+    if not path.exists():
+        return {}
+    try:
+        return json.loads(path.read_text())
+    except Exception as exc:  # noqa: BLE001
+        log.warning("Could not read manifest %s (%s) - starting fresh", path, exc)
+        return {}
+
+
+def save_manifest(path: Path, manifest: dict[str, dict[str, int]]) -> None:
+    path.write_text(json.dumps(manifest, indent=2, sort_keys=True))
+
+
+def file_fingerprint(path: Path) -> dict[str, int]:
+    st = path.stat()
+    return {"mtime_ns": st.st_mtime_ns, "size": st.st_size}
+
+
 # ---------------------------------------------------------------------------
 # Point clouds
 # ---------------------------------------------------------------------------
@@ -218,8 +239,8 @@ def read_las_metadata(path: Path, assume_crs: CRS | None = None) -> dict[str, An
     }
 
 
-def build_las_item(path: Path, meta: dict[str, Any], collection: str, asset_base_url: str, root: Path) -> dict[str, Any]:
-    rel = path.relative_to(root).as_posix()
+def build_las_item(path: Path, meta: dict[str, Any], collection: str, asset_base_url: str, data_root: Path) -> dict[str, Any]:
+    rel = path.relative_to(data_root).as_posix()
     media_type = "application/vnd.laszip+copc" if meta["is_copc"] else "application/vnd.laszip"
     return {
         "type": "Feature",
@@ -301,8 +322,8 @@ def read_pano_metadata(path: Path) -> dict[str, Any] | None:
     return {"lon": lon, "lat": lat, "datetime": capture_dt, "width": width, "height": height}
 
 
-def build_pano_item(path: Path, meta: dict[str, Any], collection: str, asset_base_url: str, root: Path) -> dict[str, Any]:
-    rel = path.relative_to(root).as_posix()
+def build_pano_item(path: Path, meta: dict[str, Any], collection: str, asset_base_url: str, data_root: Path) -> dict[str, Any]:
+    rel = path.relative_to(data_root).as_posix()
     media_type = "image/jpeg" if path.suffix.lower() in {".jpg", ".jpeg"} else "image/png"
     return {
         "type": "Feature",
@@ -338,6 +359,19 @@ def main() -> None:
     parser.add_argument("folder", type=Path, help="Folder to scan recursively")
     parser.add_argument("--dsn", required=True, help="Postgres DSN, e.g. postgresql://user:pass@localhost:5439/postgis")
     parser.add_argument("--asset-base-url", required=True, help="Base URL the files are served from, e.g. http://localhost:8081")
+    parser.add_argument(
+        "--data-root",
+        type=Path,
+        default=None,
+        help=(
+            "The folder the fileserver actually serves as its root (e.g. "
+            "./data, matching DATA_DIR in docker-compose.yml). Asset URLs "
+            "are built as {asset-base-url}/{path relative to this}. "
+            "Defaults to `folder` itself if not given - only correct when "
+            "you're scanning the fileserver's root directly rather than a "
+            "subfolder of it."
+        ),
+    )
     parser.add_argument("--pointcloud-collection", default="pointclouds")
     parser.add_argument("--panorama-collection", default="panoramas")
     parser.add_argument(
@@ -358,6 +392,18 @@ def main() -> None:
         default=3,
         help="Number of innermost folder names to join into the collection title (default: 3)",
     )
+    parser.add_argument(
+        "--manifest",
+        type=Path,
+        default=Path(".stac_ingest_manifest.json"),
+        help=(
+            "Cache file tracking which files were already successfully "
+            "ingested (by path + mtime + size), so re-running the script "
+            "against the same top-level folder only re-parses files that "
+            "are new or changed. Deleted if you want to force a full "
+            "re-scan. Default: ./.stac_ingest_manifest.json"
+        ),
+    )
     parser.add_argument("--dry-run", action="store_true", help="Scan and report only, do not write to the database")
     args = parser.parse_args()
 
@@ -367,23 +413,50 @@ def main() -> None:
     if not root.is_dir():
         sys.exit(f"{root} is not a directory")
 
+    data_root = args.data_root.resolve() if args.data_root else root
+    try:
+        root.relative_to(data_root)
+    except ValueError:
+        sys.exit(
+            f"--data-root {data_root} is not a parent of {root} - asset URLs would be "
+            "wrong. Point --data-root at the folder the fileserver actually serves."
+        )
+
+    manifest = load_manifest(args.manifest)
+    skipped_unchanged = 0
+
     las_items: list[dict[str, Any]] = []
     skipped_las = 0
     for path in iter_files(root, LAS_EXTENSIONS):
+        rel = path.relative_to(data_root).as_posix()
+        fingerprint = file_fingerprint(path)
+        if manifest.get(rel) == fingerprint:
+            skipped_unchanged += 1
+            continue
         meta = read_las_metadata(path, assume_crs=assume_crs)
         if meta is None:
             skipped_las += 1
             continue
-        las_items.append(build_las_item(path, meta, args.pointcloud_collection, args.asset_base_url, root))
+        las_items.append(build_las_item(path, meta, args.pointcloud_collection, args.asset_base_url, data_root))
+        manifest[rel] = fingerprint
 
     pano_items: list[dict[str, Any]] = []
     skipped_pano = 0
     for path in iter_files(root, IMAGE_EXTENSIONS):
+        rel = path.relative_to(data_root).as_posix()
+        fingerprint = file_fingerprint(path)
+        if manifest.get(rel) == fingerprint:
+            skipped_unchanged += 1
+            continue
         meta = read_pano_metadata(path)
         if meta is None:
             skipped_pano += 1
             continue
-        pano_items.append(build_pano_item(path, meta, args.panorama_collection, args.asset_base_url, root))
+        pano_items.append(build_pano_item(path, meta, args.panorama_collection, args.asset_base_url, data_root))
+        manifest[rel] = fingerprint
+
+    if skipped_unchanged:
+        log.info("Skipped %d file(s) unchanged since the last successful ingest", skipped_unchanged)
 
     log.info(
         "Found %d valid point cloud(s) (%d skipped) and %d valid panorama(s) (%d skipped)",
@@ -428,6 +501,11 @@ def main() -> None:
         loader.load_items(pano_items, insert_mode=Methods.upsert)
 
     log.info("Loaded %d point cloud item(s) and %d panorama item(s) into pgstac", len(las_items), len(pano_items))
+
+    # Only persist the manifest once the DB writes above have actually
+    # succeeded - if anything raised before this point, we want the
+    # affected files retried on the next run rather than skipped forever.
+    save_manifest(args.manifest, manifest)
 
 
 if __name__ == "__main__":
