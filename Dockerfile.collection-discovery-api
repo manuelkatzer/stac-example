@@ -1,0 +1,18 @@
+# Minimal image for the federated-collection-discovery backend
+# (https://pypi.org/project/federated-collection-discovery/) - no
+# published Docker image exists for this package, so this just installs
+# it from PyPI and runs it with uvicorn.
+#
+# collection_discovery_shim.py adds the /_mgmt/health, /api, and
+# /conformance endpoints the frontend expects but this backend version
+# doesn't implement yet - see that file for details.
+FROM python:3.12-slim
+
+RUN pip install --no-cache-dir "federated-collection-discovery[uvicorn]"
+
+WORKDIR /app
+COPY collection_discovery_shim.py .
+
+EXPOSE 8083
+
+CMD ["uvicorn", "collection_discovery_shim:app", "--host", "0.0.0.0", "--port", "8083"]

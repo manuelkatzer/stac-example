@@ -1,0 +1,7 @@
+data/
+output/
+.venv/
+.git/
+*.laz
+*.copc.laz
+.stac_ingest_manifest.json

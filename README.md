@@ -73,6 +73,31 @@ missing CRS) is never marked done, so it's retried on every run until
 you fix it (or pass `--assume-crs`). Delete the manifest file to force a
 full re-scan.
 
+### Ingesting from a folder that isn't under `./data`
+
+`./data` isn't a hard requirement - it's just what `docker-compose.yml`
+defaults to serving. If your data lives somewhere else entirely (e.g.
+`~/lidar/some_project`), use `ingest_folder.sh` instead of calling
+`scan_and_ingest.py` directly:
+
+```bash
+./ingest_folder.sh ~/lidar/some_project --assume-crs EPSG:5682
+```
+
+This remounts the `fileserver` container to serve that folder directly
+(`DATA_DIR=<folder>`, recreating just that one container - `pgstac` and
+`stac-fastapi` are untouched) and then runs the ingest with
+`--data-root` set to match, in one step. Any extra arguments you pass
+(like `--assume-crs` above) are forwarded straight to
+`scan_and_ingest.py`.
+
+**This replaces what the fileserver serves rather than adding to it.**
+Items already in pgstac whose assets lived under a previously-mounted
+folder will start 404ing once you point the fileserver elsewhere - this
+setup serves one folder at a time. If you need multiple folders served
+simultaneously, that means a second `fileserver`-style container with
+its own `DATA_DIR` and host port in `docker-compose.yml`.
+
 `uv sync` reads `pyproject.toml`, creates `.venv/`, and writes `uv.lock` on
 first run. Commit `uv.lock` once it exists so everyone (and CI) resolves
 the same dependency versions.
@@ -104,6 +129,60 @@ shows footprints once you filter and search, but doesn't visualize
 collection-level extents on the map. For a "walk up and see what data we
 have" experience, point people at stac-browser
 (`http://localhost:8082`) instead - that's what it's built for.
+
+## 5. See all collection extents on one map
+
+stac-browser shows a nice map *within* a single collection, but its
+catalog-listing page (the grid of collection cards) doesn't have a map
+at all - a known, still-open gap in that project
+(github.com/radiantearth/stac-browser/issues/14), not something
+specific to this setup.
+
+`collections_map.py` fills that gap using the standard tools for it -
+[stacmap](https://github.com/aazuspan/stacmap) on top of
+`pystac-client` - rather than anything custom-built:
+
+```bash
+uv run collections_map.py --stac-api http://localhost:8080 --out output/collections_map.html
+```
+
+Open the resulting HTML file directly in a browser - no server needed.
+
+## 6. Live collection-discovery dashboard
+
+For a "walk up, see live status, browse extents on a map" dashboard
+that runs continuously (rather than a script you re-run), two more
+services in `docker-compose.yml` add
+[federated-collection-discovery](https://pypi.org/project/federated-collection-discovery/)
+(a small FastAPI app on PyPI that federates collection-search across
+one or more STAC APIs) and its companion UI,
+[stac-collection-discovery](https://github.com/developmentseed/stac-collection-discovery)
+(search, spatial extent, and live per-API health status).
+
+```bash
+docker compose up -d --build collection-discovery-api collection-discovery-ui
+```
+
+Open `http://localhost:8084`.
+
+A few things worth knowing:
+
+- **No published Docker image exists for either piece.**
+  `collection-discovery-api` is built from the PyPI package directly
+  (see `Dockerfile.collection-discovery-api`); `collection-discovery-ui`
+  is built straight from its git source, since Compose can use a git
+  repo URL as a build context. Expect the first `--build` to take a
+  minute or two.
+- **The UI's Dockerfile runs a live Vite dev server** (`yarn dev`), not
+  a production build - that's simply what the upstream project ships
+  today. Fine for local use, not something to expose publicly as-is.
+- **Only one API is federated right now** -
+  `FEDERATED_STAC_API_URLS=http://stac-fastapi:8080` in
+  `docker-compose.yml`. This is exactly the piece that would let this
+  dashboard search across multiple sites later: the env var takes a
+  comma-separated list of STAC API URLs, so adding a second site's
+  catalog is a one-line change once you actually have one running
+  somewhere.
 
 ## Known limitations / next steps
 

@@ -1,0 +1,22 @@
+# Clones stac-collection-discovery ourselves (rather than using Docker's
+# git-context build) specifically so we can swap out its config.ts before
+# building - the upstream file's own comments say to do exactly this
+# ("replace this file before building"), since it ships hardcoded to
+# four unrelated demo STAC APIs (MAAP, VEDA, ESA, NASA CMR).
+FROM node:24.15.0
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends git \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN git clone --branch main --depth 1 \
+    https://github.com/developmentseed/stac-collection-discovery.git .
+
+COPY collection-discovery-ui.config.ts src/config.ts
+
+RUN yarn install && yarn cache clean
+
+EXPOSE 3000
+
+CMD ["yarn", "dev", "--host", "0.0.0.0"]

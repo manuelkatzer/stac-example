@@ -41,6 +41,11 @@ services:
       WEB_CONCURRENCY: 1
       USE_API_HYDRATE: "true"
       ENABLE_TRANSACTIONS_EXTENSIONS: "true"
+      # Needed for collection-discovery-ui: some of its checks (API docs,
+      # conformance) run directly in the browser rather than through the
+      # collection-discovery-api backend, so the browser's origin needs
+      # to be explicitly allowed here or those requests get CORS-blocked.
+      CORS_ORIGINS: "http://localhost:8084"
     ports:
       - "8080:8080"
 
@@ -72,6 +77,50 @@ services:
       SB_catalogUrl: "http://localhost:8080"
     ports:
       - "8082:8080"
+
+  # Backend for the collection-discovery dashboard below: a small FastAPI
+  # app (PyPI: federated-collection-discovery) that federates
+  # collection-search across one or more STAC APIs. Right now it's just
+  # pointed at our own stac-fastapi, but this is exactly the piece that
+  # would let it search across multiple sites later.
+  #
+  # Uses host networking (Linux) so it reaches stac-fastapi via the same
+  # http://localhost:8080 URL your browser uses - not the internal
+  # Docker hostname. STAC APIs bake whatever host they were *called with*
+  # into their own self/collection/parent links, so if this queried
+  # stac-fastapi via the internal service name instead, every link
+  # returned to the dashboard UI would be unreachable from your actual
+  # browser.
+  collection-discovery-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.collection-discovery-api
+    depends_on:
+      - stac-fastapi
+    network_mode: host
+    environment:
+      FEDERATED_STAC_API_URLS: "http://localhost:8080"
+
+  # Dashboard UI: search/browse collections (with spatial extent, live
+  # per-API health status) across whatever APIs collection-discovery-api
+  # is configured to federate. Built via our own Dockerfile (which clones
+  # the source and swaps in our config.ts - see collection-discovery-ui.config.ts)
+  # rather than Docker's git-context build, since the upstream config.ts
+  # ships hardcoded to unrelated demo STAC APIs.
+  # Note: their own Dockerfile runs a live Vite dev server (`yarn dev`),
+  # not a production build - fine for local use, not hardened for prod.
+  collection-discovery-ui:
+    build:
+      context: .
+      dockerfile: Dockerfile.collection-discovery-ui
+    depends_on:
+      - collection-discovery-api
+    environment:
+      # Read client-side in the browser, so this must be reachable from
+      # your actual browser (localhost), not the internal Docker network.
+      VITE_API_URL: "http://localhost:8083"
+    ports:
+      - "8084:3000"
 
 volumes:
   pgstac_data:
