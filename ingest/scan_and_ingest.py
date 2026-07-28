@@ -22,7 +22,9 @@ import argparse
 import datetime as dt
 import json
 import logging
+import re
 import sys
+from collections import defaultdict
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -126,6 +128,12 @@ def iter_files(root: Path, extensions: set[str]) -> Iterable[Path]:
     for path in sorted(root.rglob("*")):
         if path.is_file() and path.suffix.lower() in extensions:
             yield path
+
+
+def sanitize_collection_id(name: str) -> str:
+    """Turn a folder name into a clean, URL/id-safe collection id."""
+    slug = re.sub(r"[^a-zA-Z0-9]+", "-", name).strip("-").lower()
+    return slug or "unnamed"
 
 
 def load_manifest(path: Path) -> dict[str, dict[str, int]]:
@@ -389,7 +397,17 @@ def main() -> None:
             "subfolder of it."
         ),
     )
-    parser.add_argument("--pointcloud-collection", default="pointclouds")
+    parser.add_argument(
+        "--pointcloud-collection",
+        default=None,
+        help=(
+            "Force all point clouds into one collection with this id, "
+            "regardless of folder. If not given (the default), each file "
+            "gets its own collection named after the folder that directly "
+            "contains it - e.g. files under .../Prio_1/ land in a "
+            "'prio-1' collection, files under .../SiteB/ in 'siteb', etc."
+        ),
+    )
     parser.add_argument("--panorama-collection", default="panoramas")
     parser.add_argument(
         "--assume-crs",
@@ -436,7 +454,7 @@ def main() -> None:
     manifest = load_manifest(args.manifest)
     skipped_unchanged = 0
 
-    las_items: list[dict[str, Any]] = []
+    las_items_by_collection: dict[str, list[dict[str, Any]]] = defaultdict(list)
     skipped_las = 0
     for path in iter_files(root, LAS_EXTENSIONS):
         rel = path.relative_to(data_root).as_posix()
@@ -448,7 +466,10 @@ def main() -> None:
         if meta is None:
             skipped_las += 1
             continue
-        las_items.append(build_las_item(path, meta, args.pointcloud_collection, args.asset_base_url, data_root))
+        collection_id = args.pointcloud_collection or sanitize_collection_id(path.parent.name)
+        las_items_by_collection[collection_id].append(
+            build_las_item(path, meta, collection_id, args.asset_base_url, data_root)
+        )
         manifest[rel] = fingerprint
 
     pano_items: list[dict[str, Any]] = []
@@ -469,32 +490,33 @@ def main() -> None:
     if skipped_unchanged:
         log.info("Skipped %d file(s) unchanged since the last successful ingest", skipped_unchanged)
 
+    total_las = sum(len(items) for items in las_items_by_collection.values())
     log.info(
-        "Found %d valid point cloud(s) (%d skipped) and %d valid panorama(s) (%d skipped)",
-        len(las_items), skipped_las, len(pano_items), skipped_pano,
+        "Found %d valid point cloud(s) across %d collection(s) (%d skipped) and %d valid panorama(s) (%d skipped)",
+        total_las, len(las_items_by_collection), skipped_las, len(pano_items), skipped_pano,
     )
 
     if args.dry_run:
         log.info("Dry run - nothing written to the database")
         return
 
-    if not las_items and not pano_items:
+    if not las_items_by_collection and not pano_items:
         log.info("Nothing to load")
         return
 
     db = PgstacDB(dsn=args.dsn)
     loader = Loader(db=db)
 
-    if las_items:
+    for collection_id, items in las_items_by_collection.items():
         collection_doc = base_collection(
-            args.pointcloud_collection,
-            "LAS/LAZ point clouds ingested from local storage",
+            collection_id,
+            f"LAS/LAZ point clouds ingested from local storage (folder: {collection_id})",
         )
-        bbox, time_range = batch_extent(las_items)
-        existing = fetch_existing_extent(args.dsn, args.pointcloud_collection)
+        bbox, time_range = batch_extent(items)
+        existing = fetch_existing_extent(args.dsn, collection_id)
         collection_doc["extent"] = merge_extents(existing, bbox, time_range)
         loader.load_collections([collection_doc], insert_mode=Methods.upsert)
-        loader.load_items(las_items, insert_mode=Methods.upsert)
+        loader.load_items(items, insert_mode=Methods.upsert)
 
     if pano_items:
         collection_doc = base_collection(
@@ -507,7 +529,7 @@ def main() -> None:
         loader.load_collections([collection_doc], insert_mode=Methods.upsert)
         loader.load_items(pano_items, insert_mode=Methods.upsert)
 
-    log.info("Loaded %d point cloud item(s) and %d panorama item(s) into pgstac", len(las_items), len(pano_items))
+    log.info("Loaded %d point cloud item(s) and %d panorama item(s) into pgstac", total_las, len(pano_items))
 
     # Only persist the manifest once the DB writes above have actually
     # succeeded - if anything raised before this point, we want the

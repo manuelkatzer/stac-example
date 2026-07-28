@@ -342,5 +342,689 @@
   "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_1/segment_9.copc.laz": {
     "mtime_ns": 1785137986444296579,
     "size": 222072735
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_001.copc.laz": {
+    "mtime_ns": 1781593415892061300,
+    "size": 214483345
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_002.copc.laz": {
+    "mtime_ns": 1781593449247803800,
+    "size": 268777688
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_003.copc.laz": {
+    "mtime_ns": 1781593489757231900,
+    "size": 296365233
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_004.copc.laz": {
+    "mtime_ns": 1781593531986504900,
+    "size": 328145422
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_005.copc.laz": {
+    "mtime_ns": 1781593573597368600,
+    "size": 328078997
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_006.copc.laz": {
+    "mtime_ns": 1781593611652944800,
+    "size": 302187171
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_007.copc.laz": {
+    "mtime_ns": 1781593656850576900,
+    "size": 296109578
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_008.copc.laz": {
+    "mtime_ns": 1781593697559104500,
+    "size": 292970259
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_009.copc.laz": {
+    "mtime_ns": 1781593739753754600,
+    "size": 290578838
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_010.copc.laz": {
+    "mtime_ns": 1781593779543787300,
+    "size": 269832565
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_011.copc.laz": {
+    "mtime_ns": 1781593829163810700,
+    "size": 351594837
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_012.copc.laz": {
+    "mtime_ns": 1781593878995462800,
+    "size": 335287459
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_013.copc.laz": {
+    "mtime_ns": 1781593925278766400,
+    "size": 299770469
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_014.copc.laz": {
+    "mtime_ns": 1781593972555300200,
+    "size": 357959161
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_015.copc.laz": {
+    "mtime_ns": 1781594019437809400,
+    "size": 348294315
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_016.copc.laz": {
+    "mtime_ns": 1781594066527799500,
+    "size": 332919977
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_017.copc.laz": {
+    "mtime_ns": 1781594118725317000,
+    "size": 370638160
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_018.copc.laz": {
+    "mtime_ns": 1781594160816994200,
+    "size": 300520175
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_019.copc.laz": {
+    "mtime_ns": 1781594210139065900,
+    "size": 367546377
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_020.copc.laz": {
+    "mtime_ns": 1781594279097024600,
+    "size": 404896480
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_021.copc.laz": {
+    "mtime_ns": 1781594321452171600,
+    "size": 293094464
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_022.copc.laz": {
+    "mtime_ns": 1781594375218199500,
+    "size": 364214713
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_023.copc.laz": {
+    "mtime_ns": 1781594434195416100,
+    "size": 346923410
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_024.copc.laz": {
+    "mtime_ns": 1781594483806593500,
+    "size": 326992764
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_025.copc.laz": {
+    "mtime_ns": 1781594538771375900,
+    "size": 382878651
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_026.copc.laz": {
+    "mtime_ns": 1781594584455036500,
+    "size": 305752635
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_027.copc.laz": {
+    "mtime_ns": 1781594624534900100,
+    "size": 271745268
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_028.copc.laz": {
+    "mtime_ns": 1781594665555108400,
+    "size": 276442958
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_029.copc.laz": {
+    "mtime_ns": 1781594705803534300,
+    "size": 284706081
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_030.copc.laz": {
+    "mtime_ns": 1781594750145667100,
+    "size": 309698645
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_031.copc.laz": {
+    "mtime_ns": 1781594787085789600,
+    "size": 250199053
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_032.copc.laz": {
+    "mtime_ns": 1781594828665937200,
+    "size": 313476911
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_033.copc.laz": {
+    "mtime_ns": 1781594865608200700,
+    "size": 280185276
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_034.copc.laz": {
+    "mtime_ns": 1781594904967328700,
+    "size": 271090188
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_035.copc.laz": {
+    "mtime_ns": 1781594940098779000,
+    "size": 238429859
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_036.copc.laz": {
+    "mtime_ns": 1781594968367117100,
+    "size": 210599980
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_037.copc.laz": {
+    "mtime_ns": 1781595001464763400,
+    "size": 239218357
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_038.copc.laz": {
+    "mtime_ns": 1781595035349522400,
+    "size": 222834510
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_039.copc.laz": {
+    "mtime_ns": 1781595067380285200,
+    "size": 254561683
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_040.copc.laz": {
+    "mtime_ns": 1781595118846356000,
+    "size": 329062897
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_041.copc.laz": {
+    "mtime_ns": 1781595149026139800,
+    "size": 207795269
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_042.copc.laz": {
+    "mtime_ns": 1781595178086180300,
+    "size": 205041667
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_043.copc.laz": {
+    "mtime_ns": 1781595212197585200,
+    "size": 209148645
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_044.copc.laz": {
+    "mtime_ns": 1781595245850176400,
+    "size": 253900183
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_045.copc.laz": {
+    "mtime_ns": 1781595304159477600,
+    "size": 357665125
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_046.copc.laz": {
+    "mtime_ns": 1781595357827723100,
+    "size": 362973367
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_047.copc.laz": {
+    "mtime_ns": 1781595436462735500,
+    "size": 407775390
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_048.copc.laz": {
+    "mtime_ns": 1781595497492469500,
+    "size": 399177610
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_049.copc.laz": {
+    "mtime_ns": 1781595533367489800,
+    "size": 249092006
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_050.copc.laz": {
+    "mtime_ns": 1781595562347398000,
+    "size": 230025785
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_051.copc.laz": {
+    "mtime_ns": 1781595603805102000,
+    "size": 266595221
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_052.copc.laz": {
+    "mtime_ns": 1781595645148998300,
+    "size": 285949532
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_053.copc.laz": {
+    "mtime_ns": 1781595683279469500,
+    "size": 273002021
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_054.copc.laz": {
+    "mtime_ns": 1781595719488579100,
+    "size": 251419206
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_055.copc.laz": {
+    "mtime_ns": 1781595752823122500,
+    "size": 267441386
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_056.copc.laz": {
+    "mtime_ns": 1781595784446556400,
+    "size": 217235622
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_057.copc.laz": {
+    "mtime_ns": 1781595819114910200,
+    "size": 273650010
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_058.copc.laz": {
+    "mtime_ns": 1781595859412497500,
+    "size": 277990817
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_059.copc.laz": {
+    "mtime_ns": 1781595892083345000,
+    "size": 254573659
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_060.copc.laz": {
+    "mtime_ns": 1781595927435398100,
+    "size": 240677545
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_061.copc.laz": {
+    "mtime_ns": 1781595964987713300,
+    "size": 278108027
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_062.copc.laz": {
+    "mtime_ns": 1781596002975712600,
+    "size": 285451441
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_063.copc.laz": {
+    "mtime_ns": 1781596043438853600,
+    "size": 316653865
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_064.copc.laz": {
+    "mtime_ns": 1781596089882917900,
+    "size": 290119874
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_065.copc.laz": {
+    "mtime_ns": 1781596127318076400,
+    "size": 247066444
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_066.copc.laz": {
+    "mtime_ns": 1781596176918015700,
+    "size": 302238482
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_067.copc.laz": {
+    "mtime_ns": 1781596216903239600,
+    "size": 302183611
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_068.copc.laz": {
+    "mtime_ns": 1781596255089638400,
+    "size": 253944659
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_069.copc.laz": {
+    "mtime_ns": 1781596289377677800,
+    "size": 252205683
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_070.copc.laz": {
+    "mtime_ns": 1781596329932594800,
+    "size": 261074899
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_071.copc.laz": {
+    "mtime_ns": 1781596371321673900,
+    "size": 279062947
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_072.copc.laz": {
+    "mtime_ns": 1781596412084589200,
+    "size": 286239812
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_073.copc.laz": {
+    "mtime_ns": 1781596450449901100,
+    "size": 262795893
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_074.copc.laz": {
+    "mtime_ns": 1781596491079131700,
+    "size": 287355796
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_075.copc.laz": {
+    "mtime_ns": 1781596541560569900,
+    "size": 322789614
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_076.copc.laz": {
+    "mtime_ns": 1781596580392919600,
+    "size": 274815100
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_077.copc.laz": {
+    "mtime_ns": 1781596616968464300,
+    "size": 241941797
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_078.copc.laz": {
+    "mtime_ns": 1781596649295403500,
+    "size": 256088971
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_079.copc.laz": {
+    "mtime_ns": 1781596687248401900,
+    "size": 261676845
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_080.copc.laz": {
+    "mtime_ns": 1781596723539389800,
+    "size": 245152107
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_081.copc.laz": {
+    "mtime_ns": 1781596755585843100,
+    "size": 230756184
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_082.copc.laz": {
+    "mtime_ns": 1781596788393445000,
+    "size": 231363267
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_083.copc.laz": {
+    "mtime_ns": 1781596823564216200,
+    "size": 246563393
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_084.copc.laz": {
+    "mtime_ns": 1781596848803650700,
+    "size": 200739227
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_085.copc.laz": {
+    "mtime_ns": 1781596873179795800,
+    "size": 193857512
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_086.copc.laz": {
+    "mtime_ns": 1781596906546437700,
+    "size": 224056157
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_087.copc.laz": {
+    "mtime_ns": 1781596948448128700,
+    "size": 256193055
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_088.copc.laz": {
+    "mtime_ns": 1781596971115725100,
+    "size": 171558608
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_089.copc.laz": {
+    "mtime_ns": 1781597001776569500,
+    "size": 225906065
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_090.copc.laz": {
+    "mtime_ns": 1781597042307048800,
+    "size": 294005312
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_091.copc.laz": {
+    "mtime_ns": 1781597075919127900,
+    "size": 257909409
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_092.copc.laz": {
+    "mtime_ns": 1781597117810732300,
+    "size": 307219391
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_093.copc.laz": {
+    "mtime_ns": 1781597153397353000,
+    "size": 279533562
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_094.copc.laz": {
+    "mtime_ns": 1781597197127584800,
+    "size": 299293280
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_095.copc.laz": {
+    "mtime_ns": 1781597239716954100,
+    "size": 308753879
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_096.copc.laz": {
+    "mtime_ns": 1781597278776576000,
+    "size": 314783761
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_097.copc.laz": {
+    "mtime_ns": 1781597324425021500,
+    "size": 325505589
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_098.copc.laz": {
+    "mtime_ns": 1781597377212506600,
+    "size": 371200401
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_099.copc.laz": {
+    "mtime_ns": 1781597408974696600,
+    "size": 238813807
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_100.copc.laz": {
+    "mtime_ns": 1781597442351999900,
+    "size": 233344178
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_101.copc.laz": {
+    "mtime_ns": 1781597472603711900,
+    "size": 228485215
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_102.copc.laz": {
+    "mtime_ns": 1781597517604458700,
+    "size": 279147058
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_103.copc.laz": {
+    "mtime_ns": 1781597556825086600,
+    "size": 261265153
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_104.copc.laz": {
+    "mtime_ns": 1781597592692343700,
+    "size": 278470658
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_105.copc.laz": {
+    "mtime_ns": 1781597628741799200,
+    "size": 269244834
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_106.copc.laz": {
+    "mtime_ns": 1781597664862387300,
+    "size": 248510206
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_107.copc.laz": {
+    "mtime_ns": 1781597701221896700,
+    "size": 261982290
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_108.copc.laz": {
+    "mtime_ns": 1781597739080819500,
+    "size": 283206083
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_109.copc.laz": {
+    "mtime_ns": 1781597773501287700,
+    "size": 275877847
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_2/prio2_segment_110.copc.laz": {
+    "mtime_ns": 1781597809102719500,
+    "size": 254322374
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_001.copc.laz": {
+    "mtime_ns": 1784827810369369400,
+    "size": 340486985
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_002.copc.laz": {
+    "mtime_ns": 1784828011724552600,
+    "size": 392003058
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_003.copc.laz": {
+    "mtime_ns": 1784828061733528200,
+    "size": 428991469
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_004.copc.laz": {
+    "mtime_ns": 1784828409405986400,
+    "size": 455828564
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_005.copc.laz": {
+    "mtime_ns": 1784828404792031200,
+    "size": 397228540
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_006.copc.laz": {
+    "mtime_ns": 1784828335367111500,
+    "size": 342776570
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_007.copc.laz": {
+    "mtime_ns": 1784828644115580900,
+    "size": 386801453
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_008.copc.laz": {
+    "mtime_ns": 1784828812095009700,
+    "size": 432939926
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_009.copc.laz": {
+    "mtime_ns": 1784828648006591900,
+    "size": 330007593
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_010.copc.laz": {
+    "mtime_ns": 1784828919309370500,
+    "size": 313298617
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_011.copc.laz": {
+    "mtime_ns": 1784828981284952600,
+    "size": 347083809
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_012.copc.laz": {
+    "mtime_ns": 1784829277730226100,
+    "size": 438304635
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_013.copc.laz": {
+    "mtime_ns": 1784829510704937700,
+    "size": 441252164
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_014.copc.laz": {
+    "mtime_ns": 1784829544258168400,
+    "size": 467261932
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_015.copc.laz": {
+    "mtime_ns": 1784829785224730800,
+    "size": 417712899
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_016.copc.laz": {
+    "mtime_ns": 1784829997313515600,
+    "size": 424322315
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_017.copc.laz": {
+    "mtime_ns": 1784829929565954600,
+    "size": 400058893
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_018.copc.laz": {
+    "mtime_ns": 1784830121548837400,
+    "size": 353489549
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_019.copc.laz": {
+    "mtime_ns": 1784830273984171400,
+    "size": 357948995
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_020.copc.laz": {
+    "mtime_ns": 1784830464351921800,
+    "size": 465093283
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_021.copc.laz": {
+    "mtime_ns": 1784831383110123500,
+    "size": 689685450
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_022.copc.laz": {
+    "mtime_ns": 1784831023632971500,
+    "size": 619051028
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_023.copc.laz": {
+    "mtime_ns": 1784831093527026600,
+    "size": 496903539
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_024.copc.laz": {
+    "mtime_ns": 1784831757012053400,
+    "size": 519984992
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_025.copc.laz": {
+    "mtime_ns": 1784831592203415400,
+    "size": 431402063
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_026.copc.laz": {
+    "mtime_ns": 1784831849947535700,
+    "size": 391284013
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_027.copc.laz": {
+    "mtime_ns": 1784832006480950100,
+    "size": 406678242
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_028.copc.laz": {
+    "mtime_ns": 1784832234904957800,
+    "size": 436896933
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_029.copc.laz": {
+    "mtime_ns": 1784832426073526700,
+    "size": 471472489
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_030.copc.laz": {
+    "mtime_ns": 1784832638193928200,
+    "size": 517989197
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_031.copc.laz": {
+    "mtime_ns": 1784832725086762000,
+    "size": 442419927
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_032.copc.laz": {
+    "mtime_ns": 1784832988650653000,
+    "size": 496599999
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_033.copc.laz": {
+    "mtime_ns": 1784833194202788100,
+    "size": 514277832
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_034.copc.laz": {
+    "mtime_ns": 1784833180515089400,
+    "size": 427618484
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_035.copc.laz": {
+    "mtime_ns": 1784833425644775200,
+    "size": 384641389
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_036.copc.laz": {
+    "mtime_ns": 1784833645833351300,
+    "size": 452992257
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_037.copc.laz": {
+    "mtime_ns": 1784833704939922100,
+    "size": 469959584
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_038.copc.laz": {
+    "mtime_ns": 1784833883117005500,
+    "size": 399366108
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_039.copc.laz": {
+    "mtime_ns": 1784834042796182200,
+    "size": 398909917
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_040.copc.laz": {
+    "mtime_ns": 1784834099195182500,
+    "size": 396009516
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_041.copc.laz": {
+    "mtime_ns": 1784834379882434500,
+    "size": 422510254
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_042.copc.laz": {
+    "mtime_ns": 1784834588678780700,
+    "size": 482810511
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_043.copc.laz": {
+    "mtime_ns": 1784835048152347000,
+    "size": 687375443
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_044.copc.laz": {
+    "mtime_ns": 1784835378822678800,
+    "size": 684197656
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_045.copc.laz": {
+    "mtime_ns": 1784835785059521600,
+    "size": 693021426
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_046.copc.laz": {
+    "mtime_ns": 1784836730935161300,
+    "size": 819819035
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_047.copc.laz": {
+    "mtime_ns": 1784836555187168800,
+    "size": 667674802
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_048.copc.laz": {
+    "mtime_ns": 1784837308447896100,
+    "size": 695872407
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_049.copc.laz": {
+    "mtime_ns": 1784837785632461300,
+    "size": 690112090
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_050.copc.laz": {
+    "mtime_ns": 1784838313858619700,
+    "size": 736706476
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_051.copc.laz": {
+    "mtime_ns": 1784838827473639200,
+    "size": 758294862
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_052.copc.laz": {
+    "mtime_ns": 1784838919872254300,
+    "size": 673803965
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_053.copc.laz": {
+    "mtime_ns": 1784839375191796100,
+    "size": 647573318
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_054.copc.laz": {
+    "mtime_ns": 1784840094219886300,
+    "size": 717658407
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_055.copc.laz": {
+    "mtime_ns": 1784840211080169700,
+    "size": 620955804
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_056.copc.laz": {
+    "mtime_ns": 1784840453560477100,
+    "size": 589467925
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_057.copc.laz": {
+    "mtime_ns": 1784840983698414900,
+    "size": 552458673
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_058.copc.laz": {
+    "mtime_ns": 1784840544643601400,
+    "size": 372990615
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_059.copc.laz": {
+    "mtime_ns": 1784840746548779200,
+    "size": 328276786
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_060.copc.laz": {
+    "mtime_ns": 1784840886638158700,
+    "size": 362328785
+  },
+  "Files_Voxel_CNN_LR/Linker_Rhein/QGIS/COPC/Prio_3/prio3_segment_061.copc.laz": {
+    "mtime_ns": 1784841021124419800,
+    "size": 287197851
   }
 }
