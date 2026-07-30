@@ -1,0 +1,21 @@
+# Point cloud / panorama data - large, and no build needs it in its context
+data/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.stac_ingest_manifest.json
+
+# Node (in case any service builds from a local checkout instead of git clone)
+node_modules/
+dist/
+
+# VCS / editor
+.git/
+.gitignore
+.gitattributes
+*.swp
+
+# Env files - don't bake secrets into image layers
+.env

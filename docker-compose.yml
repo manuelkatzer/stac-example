@@ -73,5 +73,18 @@ services:
     ports:
       - "8082:8080"
 
+  stac-map:
+      build:
+        context: .
+        dockerfile: stac-map/Dockerfile
+      depends_on:
+        - stac-fastapi
+      environment:
+        VITE_BASE_PATH: "/"
+        VITE_DEFAULT_HREF: "http://localhost:8080"
+        VITE_STAC_BROWSER_URL: "http://localhost:8082/#/external/"
+      ports:
+        - "8083:4173"
+
 volumes:
   pgstac_data:
