@@ -14,7 +14,6 @@ search/filter UI.
 ## 1. Start the services
 
 ```bash
-cp .env.example .env
 docker compose up -d
 ```
 
@@ -44,8 +43,7 @@ Earth Search one, with `links` for `search`/`collections`/`conformance`.
 
 ## 2. Put some data in `./data`
 
-Drop `.las`/`.laz` files and panorama photos (JPEG/PNG, roughly 2:1
-aspect ratio) anywhere under `./data`, in whatever subfolders you like.
+Drop `.las`/`.laz` files anywhere under `./data`, in whatever subfolders you like.
 
 ## 3. Ingest
 
@@ -84,15 +82,23 @@ Each file is only ingested if it has what STAC needs:
 
 - **LAS/LAZ**: a CRS embedded in the header, and a valid bounding box.
   Files with neither are skipped and logged.
-- **Panoramas**: roughly 2:1 aspect ratio (equirectangular), plus GPS
-  EXIF data (`GPSLatitude`/`GPSLongitude`). Files without GPS are
-  skipped and logged - there's no way to place them on a map otherwise.
 
-Point clouds land in a `pointclouds` collection, panoramas in a
-`panoramas` collection (override with `--pointcloud-collection` /
-`--panorama-collection`).
+Point clouds land in a `pointclouds` collection (override with `--pointcloud-collection`).
 
-## 4. Connect QGIS
+## 4. Stac-map
+
+In the browser look at
+
+```bash
+http://localhost:8082
+```
+
+It should open the stac-map ui where you should be able to see the bboxes 
+of the collections on a map and the bboxes of the items by clicking on the 
+collections, and also file download should work.
+
+
+## 5. Connect QGIS
 
 Data Source Manager → STAC → new connection → `http://localhost:8080`.
 Use Filters to draw a bounding box and search - footprints for point
