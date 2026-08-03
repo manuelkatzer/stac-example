@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Scan a folder for LAS/LAZ point clouds and panoramic images, extract the
-metadata STAC needs (CRS + bounding box, or GPS location, plus a capture
-timestamp), and load whatever qualifies straight into a pgstac database.
+Scan a folder for LAS/LAZ point clouds, extract the metadata STAC needs
+(CRS + bounding box, plus a capture timestamp), and load whatever
+qualifies straight into a pgstac database.
 
 Files missing the required metadata are skipped and logged - never
 partially ingested.
@@ -16,7 +16,6 @@ Usage:
 fileserver container in docker-compose.yml is serving, since the asset
 hrefs written into STAC are built as `{asset-base-url}/{relative-path}`.
 """
-from __future__ import annotations
 
 import argparse
 import datetime as dt
@@ -25,22 +24,20 @@ import logging
 import re
 import sys
 from collections import defaultdict
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 import laspy
 import psycopg
-from PIL import Image
-from PIL.ExifTags import GPSTAGS, TAGS
-from pyproj import CRS, Transformer
 from pypgstac.db import PgstacDB
 from pypgstac.load import Loader, Methods
+from pyproj import CRS, Transformer
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 log = logging.getLogger("stac-ingest")
 
 LAS_EXTENSIONS = {".las", ".laz"}
-IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".tif", ".tiff"}
 
 
 def base_collection(collection_id: str, description: str) -> dict[str, Any]:
@@ -67,8 +64,10 @@ def batch_extent(items: list[dict[str, Any]]) -> tuple[list[float], list[str]] |
         return None
     bboxes = [item["bbox"] for item in items]
     bbox = [
-        min(b[0] for b in bboxes), min(b[1] for b in bboxes),
-        max(b[2] for b in bboxes), max(b[3] for b in bboxes),
+        min(b[0] for b in bboxes),
+        min(b[1] for b in bboxes),
+        max(b[2] for b in bboxes),
+        max(b[3] for b in bboxes),
     ]
     datetimes = sorted(item["properties"]["datetime"] for item in items)
     return bbox, [datetimes[0], datetimes[-1]]
@@ -78,14 +77,16 @@ def fetch_existing_extent(dsn: str, collection_id: str) -> dict[str, Any] | None
     """The current extent object for a collection already in pgstac, if any."""
     try:
         with psycopg.connect(dsn) as conn, conn.cursor() as cur:
-            cur.execute("SELECT content->'extent' FROM collections WHERE id = %s", (collection_id,))
+            cur.execute(
+                "SELECT content->'extent' FROM collections WHERE id = %s",
+                (collection_id,),
+            )
             row = cur.fetchone()
             return row[0] if row else None
     except Exception as exc:  # noqa: BLE001
         log.warning(
-            "Could not read existing extent for collection %r (%s) - "
-            "starting fresh from this batch only",
-            collection_id, exc,
+            f"Could not read existing extent for collection {collection_id!r} "
+            f"({exc}) - starting fresh from this batch only"
         )
         return None
 
@@ -104,8 +105,10 @@ def merge_extents(
 
         if old_bbox and old_bbox[0] is not None and old_bbox != [-180, -90, 180, 90]:
             merged_bbox = [
-                min(old_bbox[0], bbox[0]), min(old_bbox[1], bbox[1]),
-                max(old_bbox[2], bbox[2]), max(old_bbox[3], bbox[3]),
+                min(old_bbox[0], bbox[0]),
+                min(old_bbox[1], bbox[1]),
+                max(old_bbox[2], bbox[2]),
+                max(old_bbox[3], bbox[3]),
             ]
         else:
             merged_bbox = bbox
@@ -143,7 +146,7 @@ def load_manifest(path: Path) -> dict[str, dict[str, int]]:
     try:
         return json.loads(path.read_text())
     except Exception as exc:  # noqa: BLE001
-        log.warning("Could not read manifest %s (%s) - starting fresh", path, exc)
+        log.warning(f"Could not read manifest {path} ({exc}) - starting fresh")
         return {}
 
 
@@ -160,6 +163,7 @@ def file_fingerprint(path: Path) -> dict[str, int]:
 # Point clouds
 # ---------------------------------------------------------------------------
 
+
 def looks_like_copc(path: Path) -> bool:
     # Heuristic only: files produced by common COPC tools (PDAL, untwine,
     # copc-lib) are conventionally named "*.copc.laz". This does not parse
@@ -168,7 +172,9 @@ def looks_like_copc(path: Path) -> bool:
     return path.name.lower().endswith(".copc.laz")
 
 
-def read_las_metadata(path: Path, assume_crs: CRS | None = None) -> dict[str, Any] | None:
+def read_las_metadata(
+    path: Path, assume_crs: CRS | None = None
+) -> dict[str, Any] | None:
     try:
         with laspy.open(path) as reader:
             header = reader.header
@@ -182,38 +188,41 @@ def read_las_metadata(path: Path, assume_crs: CRS | None = None) -> dict[str, An
                 reader.evlrs  # noqa: B018 - accessing the property reads & caches them
                 crs = header.parse_crs()
     except Exception as exc:  # noqa: BLE001
-        log.warning("Skipping %s: could not read LAS/LAZ header (%s)", path, exc)
+        log.warning(f"Skipping {path}: could not read LAS/LAZ header ({exc})")
         return None
 
     if crs is None:
         if assume_crs is not None:
             log.info(
-                "%s: no usable CRS embedded (VLR/EVLR present but empty) - using --assume-crs %s",
-                path, assume_crs,
+                f"{path}: no usable CRS embedded (VLR/EVLR present but empty) - "
+                f"using --assume-crs {assume_crs}"
             )
             crs = assume_crs
         else:
             log.warning(
-                "Skipping %s: no usable CRS embedded (VLR/EVLR present but empty) - "
-                "pass --assume-crs if you know what it should be",
-                path,
+                f"Skipping {path}: no usable CRS embedded (VLR/EVLR present but "
+                f"empty) - pass --assume-crs if you know what it should be"
             )
             return None
 
     mins, maxs = header.mins, header.maxs
     if mins is None or maxs is None:
-        log.warning("Skipping %s: no bounding box in header", path)
+        log.warning(f"Skipping {path}: no bounding box in header")
         return None
 
     try:
         transformer = Transformer.from_crs(crs, "EPSG:4326", always_xy=True)
         corners = [
-            (mins[0], mins[1]), (maxs[0], mins[1]),
-            (maxs[0], maxs[1]), (mins[0], maxs[1]),
+            (mins[0], mins[1]),
+            (maxs[0], mins[1]),
+            (maxs[0], maxs[1]),
+            (mins[0], maxs[1]),
         ]
         lonlat_corners = [list(transformer.transform(x, y)) for x, y in corners]
     except Exception as exc:  # noqa: BLE001
-        log.warning("Skipping %s: could not reproject CRS %s to EPSG:4326 (%s)", path, crs, exc)
+        log.warning(
+            f"Skipping {path}: could not reproject CRS {crs} to EPSG:4326 ({exc})"
+        )
         return None
 
     lons = [c[0] for c in lonlat_corners]
@@ -223,9 +232,14 @@ def read_las_metadata(path: Path, assume_crs: CRS | None = None) -> dict[str, An
 
     creation_date = header.creation_date
     capture_dt = (
-        dt.datetime(creation_date.year, creation_date.month, creation_date.day, tzinfo=dt.timezone.utc)
+        dt.datetime(
+            creation_date.year,
+            creation_date.month,
+            creation_date.day,
+            tzinfo=dt.UTC,
+        )
         if creation_date
-        else dt.datetime.fromtimestamp(path.stat().st_mtime, tz=dt.timezone.utc)
+        else dt.datetime.fromtimestamp(path.stat().st_mtime, tz=dt.UTC)
     )
 
     return {
@@ -255,9 +269,17 @@ def proj_properties(crs: CRS) -> dict[str, Any]:
     return props
 
 
-def build_las_item(path: Path, meta: dict[str, Any], collection: str, asset_base_url: str, data_root: Path) -> dict[str, Any]:
+def build_las_item(
+    path: Path,
+    meta: dict[str, Any],
+    collection: str,
+    asset_base_url: str,
+    data_root: Path,
+) -> dict[str, Any]:
     rel = path.relative_to(data_root).as_posix()
-    media_type = "application/vnd.laszip+copc" if meta["is_copc"] else "application/vnd.laszip"
+    media_type = (
+        "application/vnd.laszip+copc" if meta["is_copc"] else "application/vnd.laszip"
+    )
     return {
         "type": "Feature",
         "stac_version": "1.0.0",
@@ -287,103 +309,25 @@ def build_las_item(path: Path, meta: dict[str, Any], collection: str, asset_base
 
 
 # ---------------------------------------------------------------------------
-# Panoramas
-# ---------------------------------------------------------------------------
-
-def _to_degrees(value) -> float:
-    d, m, s = value
-    return float(d) + float(m) / 60 + float(s) / 3600
-
-
-def read_pano_metadata(path: Path) -> dict[str, Any] | None:
-    try:
-        img = Image.open(path)
-        width, height = img.size
-        exif = img.getexif()
-    except Exception as exc:  # noqa: BLE001
-        log.warning("Skipping %s: could not read image (%s)", path, exc)
-        return None
-
-    # Classify rather than reject: true equirectangular panoramas are ~2:1,
-    # but a perfectly ordinary geotagged photo (any aspect ratio) is just
-    # as valid to place on a map - it just isn't a 360 panorama.
-    is_equirectangular = height > 0 and abs(width / height - 2.0) <= 0.05
-
-    gps_ifd = exif.get_ifd(0x8825) if hasattr(exif, "get_ifd") else {}
-    if not gps_ifd:
-        log.warning("Skipping %s: no GPS EXIF data present", path)
-        return None
-
-    gps = {GPSTAGS.get(k, k): v for k, v in gps_ifd.items()}
-    if "GPSLatitude" not in gps or "GPSLongitude" not in gps:
-        log.warning("Skipping %s: GPS EXIF present but missing lat/lon", path)
-        return None
-
-    lat = _to_degrees(gps["GPSLatitude"])
-    if gps.get("GPSLatitudeRef") == "S":
-        lat = -lat
-    lon = _to_degrees(gps["GPSLongitude"])
-    if gps.get("GPSLongitudeRef") == "W":
-        lon = -lon
-
-    tags = {TAGS.get(k, k): v for k, v in exif.items()}
-    date_str = tags.get("DateTimeOriginal") or tags.get("DateTime")
-    capture_dt = None
-    if date_str:
-        try:
-            capture_dt = dt.datetime.strptime(date_str, "%Y:%m:%d %H:%M:%S").replace(tzinfo=dt.timezone.utc)
-        except ValueError:
-            capture_dt = None
-    if capture_dt is None:
-        capture_dt = dt.datetime.fromtimestamp(path.stat().st_mtime, tz=dt.timezone.utc)
-
-    return {
-        "lon": lon,
-        "lat": lat,
-        "datetime": capture_dt,
-        "width": width,
-        "height": height,
-        "photo_type": "equirectangular" if is_equirectangular else "perspective",
-    }
-
-
-def build_pano_item(path: Path, meta: dict[str, Any], collection: str, asset_base_url: str, data_root: Path) -> dict[str, Any]:
-    rel = path.relative_to(data_root).as_posix()
-    media_type = "image/jpeg" if path.suffix.lower() in {".jpg", ".jpeg"} else "image/png"
-    return {
-        "type": "Feature",
-        "stac_version": "1.0.0",
-        "id": path.stem,
-        "collection": collection,
-        "geometry": {"type": "Point", "coordinates": [meta["lon"], meta["lat"]]},
-        "bbox": [meta["lon"], meta["lat"], meta["lon"], meta["lat"]],
-        "properties": {
-            "datetime": meta["datetime"].isoformat(),
-            "panorama:type": meta["photo_type"],
-            "panorama:width": meta["width"],
-            "panorama:height": meta["height"],
-        },
-        "assets": {
-            "visual": {
-                "href": f"{asset_base_url.rstrip('/')}/{rel}",
-                "type": media_type,
-                "roles": ["visual"],
-                "title": path.name,
-            }
-        },
-        "links": [],
-    }
-
-
-# ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
 
+
 def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     parser.add_argument("folder", type=Path, help="Folder to scan recursively")
-    parser.add_argument("--dsn", required=True, help="Postgres DSN, e.g. postgresql://user:pass@localhost:5439/postgis")
-    parser.add_argument("--asset-base-url", required=True, help="Base URL the files are served from, e.g. http://localhost:8081")
+    parser.add_argument(
+        "--dsn",
+        required=True,
+        help="Postgres DSN, e.g. postgresql://user:pass@localhost:5439/postgis",
+    )
+    parser.add_argument(
+        "--asset-base-url",
+        required=True,
+        help="Base URL the files are served from, e.g. http://localhost:8081",
+    )
     parser.add_argument(
         "--data-root",
         type=Path,
@@ -408,7 +352,6 @@ def main() -> None:
             "'prio-1' collection, files under .../SiteB/ in 'siteb', etc."
         ),
     )
-    parser.add_argument("--panorama-collection", default="panoramas")
     parser.add_argument(
         "--assume-crs",
         default=None,
@@ -433,7 +376,11 @@ def main() -> None:
             "re-scan. Default: ./.stac_ingest_manifest.json"
         ),
     )
-    parser.add_argument("--dry-run", action="store_true", help="Scan and report only, do not write to the database")
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Scan and report only, do not write to the database",
+    )
     args = parser.parse_args()
 
     assume_crs = CRS.from_user_input(args.assume_crs) if args.assume_crs else None
@@ -466,41 +413,30 @@ def main() -> None:
         if meta is None:
             skipped_las += 1
             continue
-        collection_id = args.pointcloud_collection or sanitize_collection_id(path.parent.name)
+        collection_id = args.pointcloud_collection or sanitize_collection_id(
+            path.parent.name
+        )
         las_items_by_collection[collection_id].append(
             build_las_item(path, meta, collection_id, args.asset_base_url, data_root)
         )
         manifest[rel] = fingerprint
 
-    pano_items: list[dict[str, Any]] = []
-    skipped_pano = 0
-    for path in iter_files(root, IMAGE_EXTENSIONS):
-        rel = path.relative_to(data_root).as_posix()
-        fingerprint = file_fingerprint(path)
-        if manifest.get(rel) == fingerprint:
-            skipped_unchanged += 1
-            continue
-        meta = read_pano_metadata(path)
-        if meta is None:
-            skipped_pano += 1
-            continue
-        pano_items.append(build_pano_item(path, meta, args.panorama_collection, args.asset_base_url, data_root))
-        manifest[rel] = fingerprint
-
     if skipped_unchanged:
-        log.info("Skipped %d file(s) unchanged since the last successful ingest", skipped_unchanged)
+        log.info(
+            f"Skipped {skipped_unchanged} file(s) unchanged since the last successful ingest"
+        )
 
     total_las = sum(len(items) for items in las_items_by_collection.values())
     log.info(
-        "Found %d valid point cloud(s) across %d collection(s) (%d skipped) and %d valid panorama(s) (%d skipped)",
-        total_las, len(las_items_by_collection), skipped_las, len(pano_items), skipped_pano,
+        f"Found {total_las} valid point cloud(s) across "
+        f"{len(las_items_by_collection)} collection(s) ({skipped_las} skipped)"
     )
 
     if args.dry_run:
         log.info("Dry run - nothing written to the database")
         return
 
-    if not las_items_by_collection and not pano_items:
+    if not las_items_by_collection:
         log.info("Nothing to load")
         return
 
@@ -518,18 +454,7 @@ def main() -> None:
         loader.load_collections([collection_doc], insert_mode=Methods.upsert)
         loader.load_items(items, insert_mode=Methods.upsert)
 
-    if pano_items:
-        collection_doc = base_collection(
-            args.panorama_collection,
-            "360 panoramic photos ingested from local storage",
-        )
-        bbox, time_range = batch_extent(pano_items)
-        existing = fetch_existing_extent(args.dsn, args.panorama_collection)
-        collection_doc["extent"] = merge_extents(existing, bbox, time_range)
-        loader.load_collections([collection_doc], insert_mode=Methods.upsert)
-        loader.load_items(pano_items, insert_mode=Methods.upsert)
-
-    log.info("Loaded %d point cloud item(s) and %d panorama item(s) into pgstac", total_las, len(pano_items))
+    log.info(f"Loaded {total_las} point cloud item(s) into pgstac")
 
     # Only persist the manifest once the DB writes above have actually
     # succeeded - if anything raised before this point, we want the

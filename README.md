@@ -27,7 +27,7 @@ This starts four containers:
   plain HTTP on `http://localhost:8081`, so that STAC asset links are
   actually fetchable by pgstac/QGIS. Point your LAS/LAZ files and
   panoramas somewhere under this folder.
-- **stac-browser** - a proper browsable catalogue UI, on
+- **stac-map** - a proper browsable catalogue UI, on
   `http://localhost:8082`. This is what to point people at if you want
   them to "just go to the service and see what data exists" - it shows
   collections, their extents, and lets you drill into items, which QGIS's
