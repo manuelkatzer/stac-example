@@ -60,19 +60,7 @@ services:
   # A proper "browse what data exists" catalogue UI, backed by stac-fastapi.
   # Unlike QGIS, this is built for exactly this use case: a sidebar for
   # navigating Catalogs -> Collections -> Items, with extents shown per
-  # collection. https://github.com/radiantearth/stac-browser
-  stac-browser:
-    image: ghcr.io/radiantearth/stac-browser:latest
-    depends_on:
-      - stac-fastapi
-    environment:
-      # This runs client-side in the user's own browser, not inside the
-      # Docker network - so it must be a URL your browser can reach
-      # (localhost), not the internal service name (stac-fastapi).
-      SB_catalogUrl: "http://localhost:8080"
-    ports:
-      - "8082:8080"
-
+  # collection.
   stac-map:
       build:
         context: .
@@ -82,9 +70,8 @@ services:
       environment:
         VITE_BASE_PATH: "/"
         VITE_DEFAULT_HREF: "http://localhost:8080"
-        VITE_STAC_BROWSER_URL: "http://localhost:8082/#/external/"
       ports:
-        - "8083:4173"
+        - "8082:4173"
 
 volumes:
   pgstac_data:
