@@ -40,8 +40,6 @@ that automatically. Only required if the item predates that property or
 was ingested some other way.
 """
 
-from __future__ import annotations
-
 import argparse
 import sys
 from pathlib import Path
