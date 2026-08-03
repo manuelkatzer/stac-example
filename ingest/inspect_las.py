@@ -8,6 +8,7 @@ data lives).
 Usage:
     python inspect_las.py path/to/segment_1.copc.laz
 """
+
 import sys
 from pathlib import Path
 
@@ -60,7 +61,9 @@ def main() -> None:
         print(f"  {header.parse_crs()!r}")
 
         print("\nLooking for LASF_Projection records specifically:")
-        projection_records = list(header.vlrs.get_by_id("LASF_Projection")) + list(evlrs.get_by_id("LASF_Projection"))
+        projection_records = list(header.vlrs.get_by_id("LASF_Projection")) + list(
+            evlrs.get_by_id("LASF_Projection")
+        )
         if not projection_records:
             print("  None found in either VLRs or EVLRs.")
         for rec in projection_records:

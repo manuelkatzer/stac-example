@@ -39,6 +39,7 @@ X/Y/Z coordinates are stored in). Optional if the matched item carries a
 that automatically. Only required if the item predates that property or
 was ingested some other way.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -51,15 +52,23 @@ from laspy import Bounds, CopcReader, LasData, LasHeader
 from pyproj import CRS, Transformer
 
 
-def find_item(stac_api: str, collection: str, bbox: list[float], item_id: str | None) -> dict:
+def find_item(
+    stac_api: str, collection: str, bbox: list[float], item_id: str | None
+) -> dict:
     if item_id:
-        resp = requests.get(f"{stac_api.rstrip('/')}/collections/{collection}/items/{item_id}")
+        resp = requests.get(
+            f"{stac_api.rstrip('/')}/collections/{collection}/items/{item_id}"
+        )
         resp.raise_for_status()
         return resp.json()
 
     resp = requests.get(
         f"{stac_api.rstrip('/')}/search",
-        params={"collections": collection, "bbox": ",".join(map(str, bbox)), "limit": 1},
+        params={
+            "collections": collection,
+            "bbox": ",".join(map(str, bbox)),
+            "limit": 1,
+        },
     )
     resp.raise_for_status()
     features = resp.json().get("features", [])
@@ -83,7 +92,11 @@ def native_bounds(bbox_wgs84: list[float], native_crs: str) -> Bounds:
 
 
 def save_npz(points, out_path: Path) -> list[str]:
-    save_kwargs = {"x": np.asarray(points.x), "y": np.asarray(points.y), "z": np.asarray(points.z)}
+    save_kwargs = {
+        "x": np.asarray(points.x),
+        "y": np.asarray(points.y),
+        "z": np.asarray(points.z),
+    }
     for extra_dim in ("intensity", "classification", "return_number", "gps_time"):
         if extra_dim in points.point_format.dimension_names:
             save_kwargs[extra_dim] = np.asarray(points[extra_dim])
@@ -105,25 +118,52 @@ def save_laz(points, reader: CopcReader, native_crs: str, out_path: Path) -> Non
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--stac-api", default="http://localhost:8080", help="STAC API root URL")
-    parser.add_argument("--collection", required=True, help="Collection ID, e.g. pointclouds")
-    parser.add_argument("--item", default=None, help="Specific item ID (skips the bbox search)")
-    parser.add_argument(
-        "--bbox", type=float, nargs=4, metavar=("MIN_LON", "MIN_LAT", "MAX_LON", "MAX_LAT"),
-        required=True, help="Crop area in WGS84 lon/lat - also used to find the item if --item is not given",
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
     parser.add_argument(
-        "--crs", default=None,
+        "--stac-api", default="http://localhost:8080", help="STAC API root URL"
+    )
+    parser.add_argument(
+        "--collection", required=True, help="Collection ID, e.g. pointclouds"
+    )
+    parser.add_argument(
+        "--item", default=None, help="Specific item ID (skips the bbox search)"
+    )
+    parser.add_argument(
+        "--bbox",
+        type=float,
+        nargs=4,
+        metavar=("MIN_LON", "MIN_LAT", "MAX_LON", "MAX_LAT"),
+        required=True,
+        help="Crop area in WGS84 lon/lat - also used to find the item if --item is not given",
+    )
+    parser.add_argument(
+        "--crs",
+        default=None,
         help=(
             "The point cloud's native CRS (e.g. EPSG:5682) - needed to convert --bbox "
             "into the file's own coordinates. Optional if the item carries a proj:code "
             "property (see scan_and_ingest.py); required otherwise."
         ),
     )
-    parser.add_argument("--resolution", type=float, default=None, help="Optional: limit octree levels fetched, for a coarser/faster crop")
-    parser.add_argument("--output-dir", type=Path, default=Path("output"), help="Folder for output files (created if missing)")
-    parser.add_argument("--name", default="crop", help="Base filename (without extension) for both outputs")
+    parser.add_argument(
+        "--resolution",
+        type=float,
+        default=None,
+        help="Optional: limit octree levels fetched, for a coarser/faster crop",
+    )
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=Path("output"),
+        help="Folder for output files (created if missing)",
+    )
+    parser.add_argument(
+        "--name",
+        default="crop",
+        help="Base filename (without extension) for both outputs",
+    )
     args = parser.parse_args()
 
     args.output_dir.mkdir(parents=True, exist_ok=True)
@@ -148,13 +188,17 @@ def main() -> None:
 
     with CopcReader.open(href) as reader:
         points = reader.query(bounds=bounds, resolution=args.resolution)
-        print(f"Got {len(points)} points (out of the full file - only the matching chunks were fetched)")
+        print(
+            f"Got {len(points)} points (out of the full file - only the matching chunks were fetched)"
+        )
 
         keys = save_npz(points, npz_path)
         print(f"Saved {npz_path}: {keys}")
 
         save_laz(points, reader, native_crs, laz_path)
-        print(f"Saved {laz_path} (CRS: {native_crs}, point format: {reader.header.point_format.id})")
+        print(
+            f"Saved {laz_path} (CRS: {native_crs}, point format: {reader.header.point_format.id})"
+        )
 
 
 if __name__ == "__main__":
