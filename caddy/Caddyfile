@@ -1,3 +1,8 @@
+{
+  admin 0.0.0.0:2019
+	metrics
+}
+
 localhost:2015 {
 	root * /home/manulinux/stac-example/data
 	file_server

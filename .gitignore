@@ -5,3 +5,4 @@ __pycache__/
 data/*
 output/*
 .stac_ingest_manifest.json
+caddy.log
