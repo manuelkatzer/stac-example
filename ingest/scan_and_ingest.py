@@ -280,13 +280,21 @@ def build_las_item(
     media_type = (
         "application/vnd.laszip+copc" if meta["is_copc"] else "application/vnd.laszip"
     )
+    # Item id is derived from the full relative path (extension stripped),
+    # not just path.stem - path.stem alone collides whenever two files in
+    # different folders share a basename (e.g. the same name as .las vs
+    # .laz, or duplicate filenames across subfolders that get forced into
+    # one collection via --pointcloud-collection). Sanitizing the whole
+    # relative path keeps ids both unique and STAC/URL-safe.
+    rel_no_ext = rel[: -len(path.suffix)] if path.suffix else rel
+    item_id = sanitize_collection_id(rel_no_ext)
     return {
         "type": "Feature",
         "stac_version": "1.0.0",
         "stac_extensions": [
             "https://stac-extensions.github.io/projection/v2.0.0/schema.json",
         ],
-        "id": path.stem,
+        "id": item_id,
         "collection": collection,
         "geometry": meta["geometry"],
         "bbox": meta["bbox"],

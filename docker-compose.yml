@@ -44,19 +44,6 @@ services:
     ports:
       - "8080:8080"
 
-  # Serves ./data over plain HTTP so STAC asset hrefs (and QGIS) can
-  # actually fetch the LAS/LAZ and panorama files. Swap this out for
-  # nginx, S3, or whatever you already run in production.
-  fileserver:
-    image: halverneus/static-file-server:latest
-    environment:
-      FOLDER: /web
-      SHOW_LISTING: "true"
-    volumes:
-      - ${DATA_DIR:-./data}:/web:ro
-    ports:
-      - "8081:8080"
-
   # A proper "browse what data exists" catalogue UI, backed by stac-fastapi.
   # Unlike QGIS, this is built for exactly this use case: a sidebar for
   # navigating Catalogs -> Collections -> Items, with extents shown per
