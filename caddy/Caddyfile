@@ -1,0 +1,16 @@
+localhost:2015 {
+	root * /home/manulinux/stac-example/data
+	file_server
+
+	@options {
+		method OPTIONS
+	}
+
+	header {
+		Access-Control-Allow-Origin "*"
+		Access-Control-Allow-Methods "GET, OPTIONS"
+		Access-Control-Allow-Headers "*"
+	}
+
+	respond @options 204
+}
